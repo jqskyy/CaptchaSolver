@@ -9,6 +9,7 @@ struct Account {
     std::string passwd;
     int level = 1;
     int exp = 0;
+    double balance = 0;
     int correctCaptcha = 0;
     int wrongCaptcha = 0;
     int allCaptcha = 0;
@@ -56,6 +57,7 @@ void displayMenu(Account &acc) {
     std::cout << "====================== MENU ======================" << std::endl;
     std::cout << "Poziom: " << acc.level << std::endl;
     std::cout << "Doswiadczenie: " << acc.exp << "   (awans poziomu: " << acc.calcRequiredExp() << ")" << std::endl;
+    std::cout << "Saldo: " << acc.balance << " pln" << std::endl;
     std::cout << "Stawka: " << acc.calcRatePerCaptcha() << " pln" << std::endl << std::endl;
 
     std::cout << "[1] Rozwiaz captche" << std::endl;
@@ -69,10 +71,10 @@ void displayStatistics(Account &acc) {
     if(acc.correctCaptcha != 0 && acc.wrongCaptcha != 0) {
         std::cout << std::endl << "====================== STATYSTYKI ======================" << std::endl;
         std::cout << "Poprawne captcha: " << acc.correctCaptcha;
-        std::cout << "(" << (acc.correctCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
+        std::cout << "   (" << (acc.correctCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
 
-        std::cout << "Bledne captcha: " << acc.wrongCaptcha << std::endl;
-        std::cout << "(" << (acc.wrongCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
+        std::cout << "Bledne captcha: " << acc.wrongCaptcha;
+        std::cout << "     (" << (acc.wrongCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
 
         std::cout << "Wszystkie captcha: " << acc.allCaptcha << std::endl;
         std::cout << "====================== STATYSTYKI ======================" << std::endl;
@@ -81,7 +83,7 @@ void displayStatistics(Account &acc) {
     } else if(acc.correctCaptcha != 0 && acc.wrongCaptcha == 0) {
         std::cout << std::endl << "====================== STATYSTYKI ======================" << std::endl;
         std::cout << "Poprawne captcha: " << acc.correctCaptcha;
-        std::cout << "(" << (acc.correctCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
+        std::cout << "   (" << (acc.correctCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
 
         std::cout << "Bledne captcha: " << acc.wrongCaptcha << std::endl << std::endl;
 
@@ -93,8 +95,8 @@ void displayStatistics(Account &acc) {
         std::cout << std::endl << "====================== STATYSTYKI ======================" << std::endl;
         std::cout << "Poprawne captcha: " << acc.correctCaptcha << std::endl;
 
-        std::cout << "Bledne captcha: " << acc.wrongCaptcha << std::endl;
-        std::cout << "(" << (acc.wrongCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
+        std::cout << "Bledne captcha: " << acc.wrongCaptcha;
+        std::cout << "     (" << (acc.wrongCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
 
         std::cout << "Wszystkie captcha: " << acc.allCaptcha << std::endl;
         std::cout << "====================== STATYSTYKI ======================" << std::endl;
@@ -188,7 +190,12 @@ int main() {
     Account acc = {"test", "test123."};
     bool isUserLogged = loggingIn(acc);
 
-    if(isUserLogged) {
+    if(!isUserLogged) {
+        std::cout << "Tresc tylko dla zalogowanych uzytkownikow!";
+        std::exit(211);
+    }
+
+    while(true) {
         int userChoice = choice(acc);
 
         switch(userChoice) {
@@ -205,12 +212,15 @@ int main() {
 
                     if(currentCorrectCaptcha == currentUserCaptcha) {
                         std::cout << "Pomyslnie rozwiazano captche!" << std::endl;
-                        acc.allCaptcha += 1;
-                        acc.correctCaptcha += 1;
+                        acc.allCaptcha++;
+                        acc.correctCaptcha++;
+                        acc.exp++;
+                        acc.levelUp();
+                        acc.balance += acc.calcRatePerCaptcha();
                     } else {
                         std::cout << "Podana captcha jest nieprawidlowa!" << std::endl;
-                        acc.allCaptcha += 1;
-                        acc.wrongCaptcha += 1;
+                        acc.allCaptcha++;
+                        acc.wrongCaptcha++;
                     }
                 }
                 break;
@@ -226,7 +236,5 @@ int main() {
             default:
                 std::cout << "Nieprawidlowa wartosc! Wybierz opcje [1-4]" << std::endl << std::endl;
         }
-    } else {
-        std::cout << "Tresc tylko dla zalogowanych uzytkownikow!";
     }
 }
