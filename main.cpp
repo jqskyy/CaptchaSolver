@@ -26,7 +26,7 @@ struct Account {
     }
 
     int calcRequiredExp() const {
-        return level;
+        return (level * 50) - 10;
     }
 
     double calcRatePerCaptcha() const {
@@ -119,12 +119,9 @@ void displayStatistics(Account &acc) {
 }
 
 void displayRatesPerCaptcha(Account &acc) {
-    int counter = 1;
-
     std::cout << "================= STAWKI =================" << std::endl;
-    for(double rate  : acc.ratesPerCaptcha) {
-        std::cout << "[" << counter << " level]" << " --- " << rate << " pln" << std::endl;
-        counter++;
+    for(int i=0; i < acc.ratesPerCaptcha.size(); i++) {
+        std::cout << "[" << i+1 << " level]" << " --- " << acc.ratesPerCaptcha.at(i) << " pln" << std::endl;
     }
     std::cout << "================= STAWKI =================" << std::endl;
 }
