@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <ctime>
+#include <vector>
+#include <cmath>
 
 struct Account {
     std::string login;
@@ -13,39 +15,42 @@ struct Account {
     int correctCaptcha = 0;
     int wrongCaptcha = 0;
     int allCaptcha = 0;
+    std::vector<double> ratesPerCaptcha = {0.0001, 0.00015, 0.000185, 0.0002, 0.00024, 0.000275, 0.00035, 0.0005, 0.001, 0.00175};
+
 
     void levelUp() {
         if(exp >= calcRequiredExp()) {
             level++;
+            exp = 0;
         }
     }
 
     int calcRequiredExp() const {
-        return (level * 50) - 10;
+        return level;
     }
 
     double calcRatePerCaptcha() const {
         switch(level) {
             case 1:
-                return 0.0001;
+                return ratesPerCaptcha.at(0);
             case 2:
-                return 0.00015;
+                return ratesPerCaptcha.at(1);
             case 3:
-                return 0.000185;
+                return ratesPerCaptcha.at(2);
             case 4:
-                return 0.0002;
+                return ratesPerCaptcha.at(3);
             case 5:
-                return 0.00024;
+                return ratesPerCaptcha.at(4);
             case 6:
-                return 0.000275;
+                return ratesPerCaptcha.at(5);
             case 7:
-                return 0.00035;
+                return ratesPerCaptcha.at(6);
             case 8:
-                return 0.0005;
+                return ratesPerCaptcha.at(7);
             case 9:
-                return 0.001;
+                return ratesPerCaptcha.at(8);
             case 10:
-                return 0.00175;
+                return ratesPerCaptcha.at(9);
             default:
                 throw std::runtime_error("Invalid level!");
         }
@@ -56,7 +61,7 @@ struct Account {
 void displayMenu(Account &acc) {
     std::cout << "====================== MENU ======================" << std::endl;
     std::cout << "Poziom: " << acc.level << std::endl;
-    std::cout << "Doswiadczenie: " << acc.exp << "   (awans poziomu: " << acc.calcRequiredExp() << ")" << std::endl;
+    std::cout << "Doswiadczenie: " << acc.exp << "   (Doswiadczenie wymagane do awansu poziomu: " << acc.calcRequiredExp() << ")" << std::endl;
     std::cout << "Saldo: " << acc.balance << " pln" << std::endl;
     std::cout << "Stawka: " << acc.calcRatePerCaptcha() << " pln" << std::endl << std::endl;
 
@@ -71,10 +76,10 @@ void displayStatistics(Account &acc) {
     if(acc.correctCaptcha != 0 && acc.wrongCaptcha != 0) {
         std::cout << std::endl << "====================== STATYSTYKI ======================" << std::endl;
         std::cout << "Poprawne captcha: " << acc.correctCaptcha;
-        std::cout << "   (" << (acc.correctCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
+        std::cout << "   (" << round((static_cast<double>(acc.correctCaptcha) / acc.allCaptcha) * 100) << "%)" << std::endl;
 
         std::cout << "Bledne captcha: " << acc.wrongCaptcha;
-        std::cout << "     (" << (acc.wrongCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
+        std::cout << "     (" << round((static_cast<double>(acc.wrongCaptcha) / acc.allCaptcha) * 100) << "%)" << std::endl;
 
         std::cout << "Wszystkie captcha: " << acc.allCaptcha << std::endl;
         std::cout << "====================== STATYSTYKI ======================" << std::endl;
@@ -83,7 +88,7 @@ void displayStatistics(Account &acc) {
     } else if(acc.correctCaptcha != 0 && acc.wrongCaptcha == 0) {
         std::cout << std::endl << "====================== STATYSTYKI ======================" << std::endl;
         std::cout << "Poprawne captcha: " << acc.correctCaptcha;
-        std::cout << "   (" << (acc.correctCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
+        std::cout << "   (" << round((static_cast<double>(acc.correctCaptcha) / acc.allCaptcha) * 100) << "%)" << std::endl;
 
         std::cout << "Bledne captcha: " << acc.wrongCaptcha << std::endl << std::endl;
 
@@ -96,7 +101,7 @@ void displayStatistics(Account &acc) {
         std::cout << "Poprawne captcha: " << acc.correctCaptcha << std::endl;
 
         std::cout << "Bledne captcha: " << acc.wrongCaptcha;
-        std::cout << "     (" << (acc.wrongCaptcha / acc.allCaptcha) * 100 << "%)" << std::endl;
+        std::cout << "     (" << round((static_cast<double>(acc.wrongCaptcha) / acc.allCaptcha) * 100) << "%)" << std::endl;
 
         std::cout << "Wszystkie captcha: " << acc.allCaptcha << std::endl;
         std::cout << "====================== STATYSTYKI ======================" << std::endl;
@@ -111,7 +116,17 @@ void displayStatistics(Account &acc) {
         std::cout << "Wszystkie captcha: " << acc.allCaptcha << std::endl;
         std::cout << "====================== STATYSTYKI ======================" << std::endl;
     }
+}
 
+void displayRatesPerCaptcha(Account &acc) {
+    int counter = 1;
+
+    std::cout << "================= STAWKI =================" << std::endl;
+    for(double rate  : acc.ratesPerCaptcha) {
+        std::cout << "[" << counter << " level]" << " --- " << rate << " pln" << std::endl;
+        counter++;
+    }
+    std::cout << "================= STAWKI =================" << std::endl;
 }
 
 int choice(Account &acc) {
@@ -226,7 +241,7 @@ int main() {
                 break;
             }
             case 2:
-                std::cout << "Sprawdz stawki" << std::endl;
+                displayRatesPerCaptcha(acc);
                 break;
             case 3:
                 displayStatistics(acc);
